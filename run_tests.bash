@@ -1,0 +1,1 @@
+python3 -m unittest dsicvocer -s . -p "test*.py"
