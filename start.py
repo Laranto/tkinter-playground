@@ -12,17 +12,20 @@ root = tkinter.Tk()
 root.wm_title("Embedding in Tk")
 
 
-fig = Figure(figsize=(5, 4), dpi=100)
+fig1 = Figure(figsize=(5, 4), dpi=100)
 t = np.arange(0, 3, .01)
-fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
+fig1.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
 
-canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-canvas.draw()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+fig2 = Figure(figsize=(5, 4), dpi=100)
+fig2.add_subplot(111).plot(t, 2 * np.tan(2 * np.pi * t))
 
-toolbar = NavigationToolbar2Tk(canvas, root)
-toolbar.update()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+canvas = FigureCanvasTkAgg(fig1, master=root)  # A tk.DrawingArea.
+canvas.get_tk_widget().pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=1)
+canvas.draw_idle()
+
+# toolbar = NavigationToolbar2Tk(canvas, root)
+# toolbar.update()
+# canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
 
 def on_key_press(event):
@@ -32,15 +35,27 @@ def on_key_press(event):
 
 canvas.mpl_connect("key_press_event", on_key_press)
 
+def update(param):
+    global canvas
+    canvas.get_tk_widget().pack_forget()
+    canvas = FigureCanvasTkAgg(fig2, master=root)  # A tk.DrawingArea.
+    canvas.get_tk_widget().pack(side=tkinter.RIGHT, fill=tkinter.BOTH, expand=1)
+    canvas.draw_idle()
 
 def _quit():
     root.quit()     # stops mainloop
     root.destroy()  # this is necessary on Windows to prevent
                     # Fatal Python Error: PyEval_RestoreThread: NULL tstate
 
+buttonFrame = tkinter.Frame(master=root)
+buttonFrame.pack(side=tkinter.LEFT)
 
-button = tkinter.Button(master=root, text="Quit", command=_quit)
-button.pack(side=tkinter.BOTTOM)
+functionButtons = []
+functionButtons.append(tkinter.Button(master=buttonFrame, text="Update", command= lambda: update(1)))
+functionButtons.append(tkinter.Button(master=buttonFrame, text="Quit", command=_quit))
+
+for i,button in enumerate(functionButtons):
+    button.grid(column=0, row=i,sticky="ew")
 
 tkinter.mainloop()
 # If you put root.destroy() here, it will cause an error if the window is
